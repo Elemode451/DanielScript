@@ -1,4 +1,7 @@
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 // Class representing the overall interpreter
@@ -16,49 +19,34 @@ public class DanielScript {
             readFromFile(args[0].trim());
         }
 
-
-
         System.out.println("Successfully executed DanielScript program " + args[0]);
         System.exit(0);
-
-
-
     }
-
+    
+    // Reads the tokens from a file. fileName must be non-null.
     private static void readFromFile(String fileName) {
         String currentDirectory = System.getProperty("user.dir") + "\\" + fileName;
-        System.out.println(currentDirectory);
-        List<Token> tokens;
         try {
+            byte[] source = Files.readAllBytes(Paths.get(currentDirectory));
+            // UTF-8
+            String code = new String(source, Charset.defaultCharset());
+            if(code.isBlank() || code.isEmpty()) {
+                System.out.println("No code to process!");
+                System.exit(-1);
+            }
+                
             // Read in the file
-            tokens = read(new Scanner(new File(currentDirectory)));
-            for(Token token : tokens) {
+            Lexer lexer = new Lexer(code);
+            for(Token token : lexer.getTokens()) {
                 System.out.println(token);
             }
+            
         } catch (Exception e) {
-            System.out.println("File not found!");
+            System.out.println("File " + fileName + " not found!");
             System.exit(-1);
         }
     }
 
-    // Reads in the file provided in main. 
-    private static List<Token> read(Scanner fileScan) {
-        // List of tokens that will be populated and turned into AST later
-        List<Token> tokens = new ArrayList<>();
-       
-        String curr;
-        while(fileScan.hasNext()) {
-            curr = fileScan.next();
-            try {
-
-            } catch (Exception e) {
-                System.out.println(e);
-            }
-        }
-
-        fileScan.close();
-        return tokens;
-    }
 
 
 

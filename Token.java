@@ -3,18 +3,18 @@ import java.util.function.Function;
 public class Token {
     public final TokenType TYPE;
     public final Object VALUE;
-    public final String lexeme;
+    public final String LITERAL;
 
     public static enum TokenType {
         // Datatypes
         INTEGER(s -> Integer.valueOf(s)),
-        DECIMAL(s -> Double.valueOf(s)),
         VARIABLE, 
         
         // Operators
         MINUS, 
         PLUS, 
         MULTIPLY, 
+        EXPONENT,
         DIVIDE, 
         EQUIVALENCE,
         
@@ -56,10 +56,29 @@ public class Token {
     // Behavior: Creates a new token. Value must be non-null. 
     // Exceptions: None
     public Token(TokenType type, String value) {
-        // will take in a value, figure out what type it is, and store accordingly one created
+        // will take in a value, figure out what type it is, and store accordingly once created
         this.TYPE = type;
-        this.lexeme = value;
+        this.LITERAL = null;
         this.VALUE = type.applyCast(value);
+    }
+    // Behavior: Creates a new token with a literal. Value must be non-null. 
+    // Exceptions: None
+    public Token(TokenType type, String value, String literal) {
+        // will take in a value, figure out what type it is, and store accordingly once created
+        this.TYPE = type;
+        this.VALUE = type.applyCast(value);
+        this.LITERAL = literal;
+    }
+
+    public String toString() {
+        StringBuilder string = new StringBuilder();
+        string.append("Type: ");
+        string.append(this.TYPE);
+        string.append("Literal: ");
+        string.append(this.LITERAL);
+        string.append("Value: ");
+        string.append(this.VALUE);
+        return string.toString();
     }
 
 
