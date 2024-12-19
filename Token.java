@@ -1,59 +1,65 @@
+import java.util.function.Function;
+
 public class Token {
     public final TokenType TYPE;
     public final Object VALUE;
+    public final String lexeme;
 
     public static enum TokenType {
         // Datatypes
-        VARIABLE, INTEGER,
+        INTEGER(s -> Integer.valueOf(s)),
+        DECIMAL(s -> Double.valueOf(s)),
+        VARIABLE, 
         
         // Operators
-        MINUS, PLUS, MULTIPLY, DIVIDE, 
+        MINUS, 
+        PLUS, 
+        MULTIPLY, 
+        DIVIDE, 
+        EQUIVALENCE,
         
-        // Keywords
-        RETURN, PRINT,
+        // Keywords (Only adding return for now)
+        RETURN, PRINT, IF, THEN, ELSE,
 
         // Assignment, grouping
-        ASSIGNMENT, LPAREN, RPAREN,
+        ASSIGNMENT, 
+        LPAREN, 
+        RPAREN, 
 
-        // EOF token
+        // EOF, Error
         EOF,
-        // All other things
-        ERROR
+        ERROR;
+        
+        //For datatypes with custom logic, will want to cast them when creating token
+        private Function<String, Object> caster;
+
+        //Caster will be non-null, since it's directly coming from the enum
+        private TokenType(Function<String, Object> caster) {
+            this.caster = caster;
+        }
+        
+        // Tokens without custom logic
+        private TokenType() {
+            this.caster = null;
+        }
+
+        public Object applyCast(String value) {
+            if(caster != null) {
+                return this.caster.apply(value);
+            }
+
+            return value;
+        }
+
     }
     
     // Behavior: Creates a new token. Value must be non-null. 
     // Exceptions: None
-    public Token(String value) {
+    public Token(TokenType type, String value) {
         // will take in a value, figure out what type it is, and store accordingly one created
-
-
-        // switch(type) {
-        //     // Store as strings
-        //     case INTEGER:
-        //     this.VALUE = Integer.parseInt(value);
-        //         break;
-        //     // Parenthesis 
-        //     case RPAREN:
-        //     case LPAREN:
-        //     case MINUS:
-        //     case MULTIPLY:
-        //     case PLUS:
-        //         this.VALUE = (Character) value.toCharArray()[0];
-        //         break;
-        //     case VARIABLE:
-        //     case ASSIGNMENT:
-        //     case DIVIDE:
-        //     case PRINT:
-        //     case RETURN:
-        //         this.VALUE = value;
-        //         break;
-        //     case EOF:
-        //         this.VALUE = "EOF";
-        //         break;
-        //     default:
-        //         this.VALUE = "ERROR";
-        //         break;
-        // }
+        this.TYPE = type;
+        this.lexeme = value;
+        this.VALUE = type.applyCast(value);
     }
 
 
