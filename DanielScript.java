@@ -10,11 +10,9 @@ public class DanielScript {
     // Behavior: Handles actual interpretation of a DanielScript program
     // Exceptions: None (all are caught)  -- Caught ones are FileNotFound exception
     public static void main(String[] args){ 
-        if(args.length > 1) {
+        if(args == null || args.length > 1 || args.length < 1) {
             System.out.println("Intended use: ds [file]"); 
             System.exit(-1);
-        } else if(args.length == 0) {
-            // will add support for in-terminal interpretation
         } else {
             readFromFile(args[0].trim());
         }
@@ -37,22 +35,41 @@ public class DanielScript {
             }
                 
             // Read in the file
-            System.out.println("Creating lexer!");
             Lexer lexer = new Lexer(code);
+            if(lexer.hadError()) {
+                System.out.println(lexer.getErrors());
+                System.exit(-1);
+            }
+
             for(Token token : lexer.getTokens()) {
                 System.out.println(token);
             }
             
         } catch (Exception e) {
-            // System.out.println("File " + fileName + " not found! " + e.getCause().getStackTrace());
-            String message = e.getMessage();
-            System.out.println("Exception message: " + message);
             e.printStackTrace(); 
             System.exit(-1);
         }
     }
 
+    // A class representing an error in the interpretation.
+    public static class Error {
+        public int line;
+        public String information;
 
+        // line of error, information about error (must be non-null)
+        public Error(int line, String information) {
+            this.line = line;
+            this.information = information;
+        }
+
+        public String toString() {
+            StringBuilder string = new StringBuilder();
+            string.append(information);
+            string.append(" on line ");
+            string.append(line);
+            return string.toString();
+        }   
+    }
 
 
 

@@ -77,6 +77,8 @@ public class Token {
         string.append(this.LITERAL);
         string.append(" Value: ");
         string.append(this.VALUE);
+        string.append(" Line number: ");
+        string.append(this.LINE);
         return string.toString();
     }
 

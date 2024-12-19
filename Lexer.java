@@ -1,12 +1,11 @@
 import java.io.*;
 import java.util.*;
 
-import Token.TokenType;
-
 public class Lexer {
     private final String source;
     private final List<Token> tokens;
     private final Map<String, Token.TokenType> reserved;
+    private final List<DanielScript.Error> errors;
     private int line;
     private int start = 0;
     private int offset = 0;
@@ -14,7 +13,8 @@ public class Lexer {
     public Lexer(String source) {
         this.source = source;
         this.tokens = new ArrayList<>();
-        reserved = new HashMap<>();
+        this.errors = new ArrayList<>();
+        this.reserved = new HashMap<>();
 
         reserved.put("if", Token.TokenType.IF);
         reserved.put("then", Token.TokenType.THEN);
@@ -35,11 +35,7 @@ public class Lexer {
                 case '*': addToken(Token.TokenType.MULTIPLY); break;
                 case '^': addToken(Token.TokenType.EXPONENT); break; 
                 case '=':
-                    if(checkAhead('=')) {
-                        addToken(Token.TokenType.EQUIVALENCE);
-                    } else {
-                        addToken(Token.TokenType.ASSIGNMENT);
-                    }
+                    addToken(checkAhead('=') ? Token.TokenType.EQUIVALENCE : Token.TokenType.ASSIGNMENT);
                     break;
                 case '/':
                     if(checkAhead('/')) {
@@ -64,17 +60,19 @@ public class Lexer {
                         } else {
                             addToken(Token.TokenType.VARIABLE, endName);
                         }
-                    } 
-
+                    }  else {
+                        errors.add(new DanielScript.Error(line, "Unexpected character " + curr));
+                    }
+                        
             }
         }
-        
     }
 
     private String findName() {
         while(Character.isLetter(nextChar()) && offset < source.length()) offset++;
         return source.substring(start, offset);
     }
+    
     private double valueOfNumber() {
         while(Character.isDigit(nextChar()) && offset < source.length()) offset++;
 
@@ -86,7 +84,6 @@ public class Lexer {
 
         return Double.parseDouble(source.substring(start, offset));
     }    
-
 
     private boolean checkAhead(char check) {
         if(offset > source.length()) {
@@ -102,6 +99,14 @@ public class Lexer {
         return isNextExpected;
     }
 
+    public boolean hadError() {
+        return errors.size() != 0;
+    }
+    
+    public List<DanielScript.Error> getErrors() {
+        return this.errors;
+    }
+    
     private char nextChar() {
         if(offset < source.length()) {
             return source.charAt(offset);
