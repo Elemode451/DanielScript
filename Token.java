@@ -3,12 +3,12 @@ import java.util.function.Function;
 public class Token {
     public final TokenType TYPE;
     public final Object VALUE;
-    public final String LITERAL;
+    public final Object LITERAL;
     public final int LINE;
 
     public static enum TokenType {
         // Datatypes
-        INTEGER(s -> Integer.valueOf(s)),
+        NUMBER(s -> Double.valueOf(s)),
         VARIABLE, 
         
         // Operators
@@ -57,11 +57,11 @@ public class Token {
     // Exceptions: None
     public Token(TokenType type, String value, int line) {
         // will take in a value, figure out what type it is, and store accordingly once created
-        this(type, null, value, line);
+        this(type, value, null, line);
     }
     // Behavior: Creates a new token with a literal. Value must be non-null. 
     // Exceptions: None
-    public Token(TokenType type, String value, String literal, int line) {
+    public Token(TokenType type, String value, Object literal, int line) {
         // will take in a value, figure out what type it is, and store accordingly once created
         this.TYPE = type;
         this.VALUE = type.applyCast(value);
@@ -73,9 +73,9 @@ public class Token {
         StringBuilder string = new StringBuilder();
         string.append("Type: ");
         string.append(this.TYPE);
-        string.append("Literal: ");
+        string.append(" Literal: ");
         string.append(this.LITERAL);
-        string.append("Value: ");
+        string.append(" Value: ");
         string.append(this.VALUE);
         return string.toString();
     }

@@ -14,9 +14,9 @@ public class Lexer {
         this.tokens = new ArrayList<>();
 
         char curr;
-        while(offset <= source.length()) {
-            curr = source.charAt(offset); 
-            offset++;
+        while(offset < source.length()) {
+            start = offset;
+            curr = source.charAt(offset++); 
             
             switch(curr) {
                 case '(': addToken(Token.TokenType.LPAREN); break; 
@@ -35,9 +35,8 @@ public class Lexer {
                 case '/':
                     if(checkAhead('/')) {
                         // comments can only span one line
-                        while(nextChar() != '\n' && offset <= source.length()) {
-                            curr = source.charAt(offset); 
-                            offset++;
+                        while(nextChar() != '\n' && offset < source.length()) {
+                            curr = source.charAt(offset++); 
                         }
                     } else {
                         addToken(Token.TokenType.DIVIDE);
@@ -45,11 +44,33 @@ public class Lexer {
                 case '\n':
                     line++;
                     break;
-                default: throw new IllegalArgumentException("Character: " + curr);
+                default:
+                    if(isValidDigit(curr)) {
+                        double value = valueOfNumber();
+                        addToken(Token.TokenType.NUMBER, value);
+                    }
+
             }
         }
         
     }
+    
+    private double valueOfNumber() {
+        while(isValidDigit(nextChar()) && offset <= source.length()) offset++;
+
+        if(nextChar() == '.' && isValidDigit(nextAfterChar())) {
+            offset++;
+        }
+
+        while(isValidDigit(nextChar()) && offset <= source.length()) offset++;
+
+        return Double.parseDouble(source.substring(start, offset));
+    }
+
+    private boolean isValidDigit(char c) {
+        return !(c > '9' || c < '0');
+    }
+
 
     private boolean checkAhead(char check) {
         if(offset > source.length()) {
@@ -66,8 +87,17 @@ public class Lexer {
     }
 
     private char nextChar() {
-        if(offset <= source.length()) {
+        if(offset < source.length()) {
             return source.charAt(offset);
+        }
+
+        // EOF character
+        return '\0';
+    }
+
+    private char nextAfterChar() {
+        if(offset < source.length()) {
+            return source.charAt(offset + 1);
         }
 
         // EOF character
@@ -78,7 +108,7 @@ public class Lexer {
         addToken(type, null);
     }
   
-    private void addToken(Token.TokenType type, String literal) {
+    private void addToken(Token.TokenType type, Object literal) {
         String value = source.substring(start, offset);
         tokens.add(new Token(type, value, literal, line));
     }

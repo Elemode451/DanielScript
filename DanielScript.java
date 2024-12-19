@@ -26,6 +26,7 @@ public class DanielScript {
     // Reads the tokens from a file. fileName must be non-null.
     private static void readFromFile(String fileName) {
         String currentDirectory = System.getProperty("user.dir") + "\\" + fileName;
+        System.out.println(currentDirectory);
         try {
             byte[] source = Files.readAllBytes(Paths.get(currentDirectory));
             // UTF-8
@@ -36,13 +37,17 @@ public class DanielScript {
             }
                 
             // Read in the file
+            System.out.println("Creating lexer!");
             Lexer lexer = new Lexer(code);
             for(Token token : lexer.getTokens()) {
                 System.out.println(token);
             }
             
         } catch (Exception e) {
-            System.out.println("File " + fileName + " not found!");
+            // System.out.println("File " + fileName + " not found! " + e.getCause().getStackTrace());
+            String message = e.getMessage();
+            System.out.println("Exception message: " + message);
+            e.printStackTrace(); 
             System.exit(-1);
         }
     }

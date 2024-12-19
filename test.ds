@@ -1,5 +1,4 @@
-x = 4;
-y = 5;
+x = 4.123
+y = 5
 
-//test comment
-return x + y;
+x * y + 3z / 3^7
