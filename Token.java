@@ -4,6 +4,7 @@ public class Token {
     public final TokenType TYPE;
     public final Object VALUE;
     public final String LITERAL;
+    public final int LINE;
 
     public static enum TokenType {
         // Datatypes
@@ -26,9 +27,8 @@ public class Token {
         LPAREN, 
         RPAREN, 
 
-        // EOF, Error
-        EOF,
-        ERROR;
+        // EOF
+        EOF;
         
         //For datatypes with custom logic, will want to cast them when creating token
         private Function<String, Object> caster;
@@ -55,19 +55,18 @@ public class Token {
     
     // Behavior: Creates a new token. Value must be non-null. 
     // Exceptions: None
-    public Token(TokenType type, String value) {
+    public Token(TokenType type, String value, int line) {
         // will take in a value, figure out what type it is, and store accordingly once created
-        this.TYPE = type;
-        this.LITERAL = null;
-        this.VALUE = type.applyCast(value);
+        this(type, null, value, line);
     }
     // Behavior: Creates a new token with a literal. Value must be non-null. 
     // Exceptions: None
-    public Token(TokenType type, String value, String literal) {
+    public Token(TokenType type, String value, String literal, int line) {
         // will take in a value, figure out what type it is, and store accordingly once created
         this.TYPE = type;
         this.VALUE = type.applyCast(value);
         this.LITERAL = literal;
+        this.LINE = line;
     }
 
     public String toString() {
