@@ -37,7 +37,12 @@ public class DanielScript {
             // Read in the file
             Lexer lexer = new Lexer(code);
             if(lexer.hadError()) {
-                System.out.println(lexer.getErrors());
+                lexer.getErrors().stream().forEach(
+                    (s) -> {
+                        System.out.println(" >>> " + s);
+
+                    }
+                );
                 System.exit(-1);
             }
 

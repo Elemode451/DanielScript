@@ -49,6 +49,10 @@ public class Lexer {
                 case '\n':
                     line++;
                     break;
+                case '\t':
+                case '\r':
+                case ' ':
+                    break;
                 default:
                     if(Character.isDigit(curr)) {
                         double value = valueOfNumber();
