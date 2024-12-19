@@ -1,10 +1,12 @@
 import java.io.*;
 import java.util.*;
 
+import Token.TokenType;
+
 public class Lexer {
     private final String source;
     private final List<Token> tokens;
-    
+    private final Map<String, Token.TokenType> reserved;
     private int line;
     private int start = 0;
     private int offset = 0;
@@ -12,7 +14,14 @@ public class Lexer {
     public Lexer(String source) {
         this.source = source;
         this.tokens = new ArrayList<>();
+        reserved = new HashMap<>();
 
+        reserved.put("if", Token.TokenType.IF);
+        reserved.put("then", Token.TokenType.THEN);
+        reserved.put("else", Token.TokenType.ELSE);
+        reserved.put("print", Token.TokenType.PRINT);
+        reserved.put("return", Token.TokenType.RETURN);
+        
         char curr;
         while(offset < source.length()) {
             start = offset;
@@ -45,31 +54,38 @@ public class Lexer {
                     line++;
                     break;
                 default:
-                    if(isValidDigit(curr)) {
+                    if(Character.isDigit(curr)) {
                         double value = valueOfNumber();
                         addToken(Token.TokenType.NUMBER, value);
-                    }
+                    } else if(Character.isLetter(curr)) {
+                        String endName = findName();
+                        if(reserved.containsKey(endName)) {
+                            addToken(reserved.get(endName), endName);
+                        } else {
+                            addToken(Token.TokenType.VARIABLE, endName);
+                        }
+                    } 
 
             }
         }
         
     }
-    
-    private double valueOfNumber() {
-        while(isValidDigit(nextChar()) && offset <= source.length()) offset++;
 
-        if(nextChar() == '.' && isValidDigit(nextAfterChar())) {
+    private String findName() {
+        while(Character.isLetter(nextChar()) && offset < source.length()) offset++;
+        return source.substring(start, offset);
+    }
+    private double valueOfNumber() {
+        while(Character.isDigit(nextChar()) && offset < source.length()) offset++;
+
+        if(nextChar() == '.' && Character.isDigit(nextAfterChar())) {
             offset++;
         }
 
-        while(isValidDigit(nextChar()) && offset <= source.length()) offset++;
+        while(Character.isDigit(nextChar()) && offset < source.length()) offset++;
 
         return Double.parseDouble(source.substring(start, offset));
-    }
-
-    private boolean isValidDigit(char c) {
-        return !(c > '9' || c < '0');
-    }
+    }    
 
 
     private boolean checkAhead(char check) {
@@ -116,28 +132,6 @@ public class Lexer {
     public List<Token> getTokens() {
         return tokens;
     }
-
-    // INTEGER(s -> Integer.valueOf(s)),
-    // DECIMAL(s -> Double.valueOf(s)),
-    // VARIABLE, 
-    
-    // // Operators
-    // MINUS, 
-    // PLUS, 
-    // MULTIPLY, 
-    // DIVIDE, 
-    // EQUIVALENCE,
-    
-    // // Keywords (Only adding return for now)
-    // RETURN, PRINT, IF, THEN, ELSE,
-
-    // // Assignment, grouping
-    // ASSIGNMENT, 
-    // LPAREN, 
-    // RPAREN, 
-
-    // EOF,
-    // ERROR;
 
     
 }

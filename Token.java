@@ -19,7 +19,7 @@ public class Token {
         DIVIDE, 
         EQUIVALENCE,
         
-        // Keywords (Only adding return for now)
+        // Keywords
         RETURN, PRINT, IF, THEN, ELSE,
 
         // Assignment, grouping
