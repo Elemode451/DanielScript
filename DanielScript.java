@@ -10,6 +10,7 @@ public class DanielScript {
     // Behavior: Handles actual interpretation of a DanielScript program
     // Exceptions: None (all are caught)  -- Caught ones are FileNotFound exception
     public static void main(String[] args){ 
+        args = new String[]{"test.ds"};
         if(args == null || args.length > 1 || args.length < 1) {
             System.out.println("Intended use: ds [file]"); 
             System.exit(-1);

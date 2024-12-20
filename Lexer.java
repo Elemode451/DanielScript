@@ -35,12 +35,12 @@ public class Lexer {
                 case '^': addToken(Token.TokenType.EXPONENT); break; 
                 case '-':
                   if(Character.isDigit(nextChar())) {
-                        double value = valueOfNumber();
-                        offset++;
-                        addToken(Token.TokenType.NUMBER, value);
+                    double value = valueOfNumber();
+                    addToken(Token.TokenType.NUMBER, value);
                   } else {
-                        addToken(Token.TokenType.MINUS); 
+                    addToken(Token.TokenType.MINUS);
                   }
+
                   break; 
                 case '=':
                     addToken(checkAhead('=') ? Token.TokenType.EQUIVALENCE : Token.TokenType.ASSIGNMENT);
@@ -93,8 +93,8 @@ public class Lexer {
         }
 
         while(Character.isDigit(nextChar()) && offset < source.length()) offset++;
-
-        return Double.parseDouble(source.substring(start, offset));
+        double sub = Double.parseDouble(source.substring(start, offset));
+        return sub;
     }    
 
     private boolean checkAhead(char check) {
