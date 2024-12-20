@@ -9,3 +9,5 @@ _test = 5
 
 returner = 5
 print x  
+
+z = -5 - 6

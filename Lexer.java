@@ -30,10 +30,18 @@ public class Lexer {
             switch(curr) {
                 case '(': addToken(Token.TokenType.LPAREN); break; 
                 case ')': addToken(Token.TokenType.RPAREN); break; 
-                case '-': addToken(Token.TokenType.MINUS); break; 
                 case '+': addToken(Token.TokenType.PLUS); break; 
                 case '*': addToken(Token.TokenType.MULTIPLY); break;
                 case '^': addToken(Token.TokenType.EXPONENT); break; 
+                case '-':
+                  if(Character.isDigit(nextChar())) {
+                        offset++;
+                        double value = valueOfNumber();
+                        addToken(Token.TokenType.NUMBER, -1 * value);
+                  } else {
+                        addToken(Token.TokenType.MINUS); 
+                  }
+                  break; 
                 case '=':
                     addToken(checkAhead('=') ? Token.TokenType.EQUIVALENCE : Token.TokenType.ASSIGNMENT);
                     break;
