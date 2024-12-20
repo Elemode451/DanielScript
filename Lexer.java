@@ -35,9 +35,9 @@ public class Lexer {
                 case '^': addToken(Token.TokenType.EXPONENT); break; 
                 case '-':
                   if(Character.isDigit(nextChar())) {
-                        offset++;
                         double value = valueOfNumber();
-                        addToken(Token.TokenType.NUMBER, -1 * value);
+                        offset++;
+                        addToken(Token.TokenType.NUMBER, value);
                   } else {
                         addToken(Token.TokenType.MINUS); 
                   }
