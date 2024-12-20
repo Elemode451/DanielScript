@@ -2,9 +2,10 @@ x = 4.123
 y = 5
 
 
-@@
-x * y + (3x / 3^7)
-//return
-//print
-print x
-print y
+if (x == y) then y = x else x = y
+x = x * y + (3x / 3^7)
+x_underscore_y = 5
+_test = 5
+
+returner = 5
+print x  

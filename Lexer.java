@@ -57,7 +57,7 @@ public class Lexer {
                     if(Character.isDigit(curr)) {
                         double value = valueOfNumber();
                         addToken(Token.TokenType.NUMBER, value);
-                    } else if(Character.isLetter(curr)) {
+                    } else if(Character.isLetter(curr) || curr == '_') {
                         String endName = findName();
                         if(reserved.containsKey(endName)) {
                             addToken(reserved.get(endName), endName);
@@ -73,7 +73,7 @@ public class Lexer {
     }
 
     private String findName() {
-        while(Character.isLetter(nextChar()) && offset < source.length()) offset++;
+        while(Character.isLetter(nextChar()) || nextChar() == '_' && offset < source.length()) offset++;
         return source.substring(start, offset);
     }
     

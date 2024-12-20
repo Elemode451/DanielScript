@@ -40,7 +40,6 @@ public class DanielScript {
                 lexer.getErrors().stream().forEach(
                     (s) -> {
                         System.out.println(" >>> " + s);
-
                     }
                 );
                 System.exit(-1);
