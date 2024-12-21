@@ -1,4 +1,3 @@
-import java.io.*;
 import java.util.*;
 
 public class Lexer {
@@ -14,16 +13,18 @@ public class Lexer {
         this.source = source;
         this.tokens = new ArrayList<>();
         this.errors = new ArrayList<>();
-        this.reserved = new HashMap<>();
 
-        reserved.put("if", Token.TokenType.IF);
-        reserved.put("then", Token.TokenType.THEN);
-        reserved.put("else", Token.TokenType.ELSE);
-        reserved.put("print", Token.TokenType.PRINT);
-        reserved.put("return", Token.TokenType.RETURN);
+        this.reserved = Map.of(
+            "if", Token.TokenType.IF,
+            "then", Token.TokenType.THEN,
+            "else", Token.TokenType.ELSE,
+            "print", Token.TokenType.PRINT,
+            "return", Token.TokenType.RETURN
+        );
+
         
         char curr;
-        while(offset < source.length()) {
+        while(notAtEnd()) {
             start = offset;
             curr = source.charAt(offset++); 
             
@@ -33,22 +34,14 @@ public class Lexer {
                 case '+': addToken(Token.TokenType.PLUS); break; 
                 case '*': addToken(Token.TokenType.MULTIPLY); break;
                 case '^': addToken(Token.TokenType.EXPONENT); break; 
-                case '-':
-                  if(Character.isDigit(nextChar())) {
-                    double value = valueOfNumber();
-                    addToken(Token.TokenType.NUMBER, value);
-                  } else {
-                    addToken(Token.TokenType.MINUS);
-                  }
-
-                  break; 
+                case '-': addToken(Token.TokenType.MINUS); break;
                 case '=':
                     addToken(checkAhead('=') ? Token.TokenType.EQUIVALENCE : Token.TokenType.ASSIGNMENT);
                     break;
                 case '/':
                     if(checkAhead('/')) {
                         // comments can only span one line
-                        while(nextChar() != '\n' && offset < source.length()) {
+                        while(nextChar() != '\n' && notAtEnd()) {
                             curr = source.charAt(offset++); 
                         }
                     } else {
@@ -78,6 +71,10 @@ public class Lexer {
                         
             }
         }
+    }
+
+    private boolean notAtEnd() {
+        return offset < source.length();
     }
 
     private String findName() {
