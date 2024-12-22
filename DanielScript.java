@@ -26,7 +26,8 @@ public class DanielScript {
         try {
             Parser parser = new Parser(tokens);
             PrettyPrinter p = new PrettyPrinter();
-            System.out.println(p.print(parser.parse()));
+            var parse = parser.parse();
+            System.out.println(p.print(parse));
         } catch(Exception e) {
             e.printStackTrace();
             System.exit(-1);

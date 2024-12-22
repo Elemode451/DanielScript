@@ -5,6 +5,7 @@ public class Parser {
     private final List<Token> TOKENS;
     private int current;
     private final List<DanielScript.Error> ERRORS;
+
     // Tokens must be non-null
     public Parser(List<Token> tokens) {
         this.TOKENS = tokens;
@@ -26,10 +27,9 @@ public class Parser {
     }
 
     private boolean match(List<Token.TokenType> types) {
-        Token curr = peek();
-        for(Token.TokenType type : types) {
-            if(curr.TYPE.equals(type)) {
-                current++;
+        for (Token.TokenType type : types) {
+            if (check(type)) {
+                currToken();
                 return true;
             }
         }
@@ -38,23 +38,29 @@ public class Parser {
     }
 
     private Token peek() {
-        if(isAtEnd()) { 
-            return TOKENS.get(current - 1);
+        if (current >= TOKENS.size()) {
+            return new Token(Token.TokenType.EOF, "", null, -1); // Return a safe EOF token
         }
-
         return TOKENS.get(current);
     }
 
     private Token currToken() {
-        if(isAtEnd()) { 
-            return TOKENS.get(current - 1);
+        if (!isAtEnd()) {
+            current++;
         }
 
-        return TOKENS.get(current++);
+        return prevToken();
+    }
+
+    private Token prevToken() {
+        if (current > 0) {
+            return TOKENS.get(current - 1);
+        }
+        return new Token(Token.TokenType.EOF, "", null, -1); // Return a safe EOF token
     }
 
     private boolean isAtEnd() {
-        return TOKENS.get(current).TYPE.equals(Token.TokenType.EOF);
+        return current >= TOKENS.size() || peek().TYPE.equals(Token.TokenType.EOF);
     }
 
     private boolean check(Token.TokenType type) {
@@ -72,9 +78,9 @@ public class Parser {
         ASTNode root = arithmetic();
         ASTNode curr;
         Token operator;
-        while(match(Token.TokenType.EQUIVALENCE)) {
+        while (match(Token.TokenType.EQUIVALENCE)) {
             curr = arithmetic();
-            operator = currToken();
+            operator = prevToken();
             root = new ASTNode.BinaryNode(operator, root, curr);
         }
 
@@ -85,9 +91,9 @@ public class Parser {
         ASTNode root = term();
         ASTNode curr;
         Token operator;
-        while(match(List.of(Token.TokenType.PLUS, Token.TokenType.MINUS))) {
+        while (match(List.of(Token.TokenType.PLUS, Token.TokenType.MINUS))) {
             curr = term();
-            operator = currToken();
+            operator = prevToken();
             root = new ASTNode.BinaryNode(operator, root, curr);
         }
 
@@ -98,30 +104,30 @@ public class Parser {
         ASTNode root = factor();
         ASTNode curr;
         Token operator;
-        while(match(List.of(Token.TokenType.MULTIPLY, Token.TokenType.DIVIDE))) {
+        while (match(List.of(Token.TokenType.MULTIPLY, Token.TokenType.DIVIDE))) {
             curr = factor();
-            operator = currToken();
+            operator = prevToken();
             root = new ASTNode.BinaryNode(operator, root, curr);
         }
 
-        return root;    
+        return root;
     }
 
     public ASTNode factor() {
         ASTNode root = unary();
         ASTNode curr;
         Token operator;
-        while(match(Token.TokenType.EXPONENT)) {
+        while (match(Token.TokenType.EXPONENT)) {
             curr = factor();
-            operator = currToken();
+            operator = prevToken();
             root = new ASTNode.BinaryNode(operator, root, curr);
         }
         return root;
     }
 
     public ASTNode unary() {
-        if(match(Token.TokenType.MINUS)) {
-            Token operator = currToken();
+        if (match(Token.TokenType.MINUS)) {
+            Token operator = prevToken();
             ASTNode curr = unary();
             return new ASTNode.UnaryNode(operator, curr);
         }
@@ -130,21 +136,20 @@ public class Parser {
     }
 
     public ASTNode primary() {
-        if(match(Token.TokenType.NUMBER)) {
-            Token curr = currToken();
+        if (match(Token.TokenType.NUMBER)) {
+            Token curr = prevToken();
             return new ASTNode.LiteralNode(curr.VALUE);
         }
-        
-        if(match(Token.TokenType.LPAREN)) {
-            ASTNode curr = expression();
-            System.out.println("Parenthesize");
-            if(isMissing(Token.TokenType.RPAREN)) {
-                StringBuilder info = new StringBuilder("Missing \")\"") ;
 
-                if(check(Token.TokenType.EOF)) {
+        if (match(Token.TokenType.LPAREN)) {
+            ASTNode curr = expression();
+            if (isMissing(Token.TokenType.RPAREN)) {
+                StringBuilder info = new StringBuilder("Missing \")\"");
+
+                if (check(Token.TokenType.EOF)) {
                     info.append(" at end!");
                 } else {
-                    info.append("at line ");
+                    info.append(" at line ");
                     info.append(peek().LINE);
                 }
 
@@ -156,10 +161,9 @@ public class Parser {
 
         ERRORS.add(new DanielScript.Error(current, "Expected information"));
         throw new RuntimeException("Expected information");
-
     }
 
     public boolean isMissing(Token.TokenType type) {
-        return check(type);
+        return !check(type);
     }
 }
