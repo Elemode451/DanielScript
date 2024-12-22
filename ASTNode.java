@@ -1,28 +1,43 @@
 public abstract class ASTNode {
-    public class LiteralNode extends ASTNode {
-        private final double value;
 
-        public LiteralNode(double value) {
-            this.value = value;
+    public abstract <T> T accept(ASTNodeVisitor<T> visitor);
+
+    public interface ASTNodeVisitor<T> {
+        T visitLiteralNode(LiteralNode node);
+        T visitBinaryNode(BinaryNode node);
+        T visitUnaryNode(UnaryNode node);
+        T visitIdentifierNode(IdentifierNode node);
+    }
+
+    public static class LiteralNode extends ASTNode {
+        private final Object literal;
+
+        public LiteralNode(Object literal) {
+            this.literal = literal;
         }
 
-        public double getValue() {
-            return value;
+        public Object getLiteral() {
+            return literal;
+        }
+
+        @Override
+        public <T> T accept(ASTNodeVisitor<T> visitor) {
+            return visitor.visitLiteralNode(this);
         }
     }
 
-    public class BinaryNode extends ASTNode {
-        private final String operator;
+    public static class BinaryNode extends ASTNode {
+        private final Token operator;
         private final ASTNode left;
         private final ASTNode right;
 
-        public BinaryNode(String operator, ASTNode left, ASTNode right) {
+        public BinaryNode(Token operator, ASTNode left, ASTNode right) {
             this.operator = operator;
             this.left = left;
             this.right = right;
         }
 
-        public String getOperator() {
+        public Token getOperator() {
             return operator;
         }
 
@@ -33,27 +48,37 @@ public abstract class ASTNode {
         public ASTNode getRight() {
             return right;
         }
+
+        @Override
+        public <T> T accept(ASTNodeVisitor<T> visitor) {
+            return visitor.visitBinaryNode(this);
+        }
     }
 
-    public class UnaryNode extends ASTNode {
-        private final String operator;
+    public static class UnaryNode extends ASTNode {
+        private final Token operator;
         private final ASTNode operand;
 
-        public UnaryNode(String operator, ASTNode operand) {
+        public UnaryNode(Token operator, ASTNode operand) {
             this.operator = operator;
             this.operand = operand;
         }
 
-        public String getOperator() {
+        public Token getOperator() {
             return operator;
         }
 
         public ASTNode getOperand() {
             return operand;
         }
+
+        @Override
+        public <T> T accept(ASTNodeVisitor<T> visitor) {
+            return visitor.visitUnaryNode(this);
+        }
     }
 
-    public class IdentifierNode extends ASTNode {
+    public static class IdentifierNode extends ASTNode {
         private final String name;
 
         public IdentifierNode(String name) {
@@ -63,35 +88,10 @@ public abstract class ASTNode {
         public String getName() {
             return name;
         }
-    }
 
-    public class GroupingNode extends ASTNode {
-        private final ASTNode expression;
-
-        public GroupingNode(ASTNode expression) {
-            this.expression = expression;
-        }
-
-        public ASTNode getExpression() {
-            return expression;
-        }
-    }
-
-    public class EqualityNode extends ASTNode {
-        private final ASTNode left;
-        private final ASTNode right;
-
-        public EqualityNode(ASTNode left, ASTNode right) {
-            this.left = left;
-            this.right = right;
-        }
-
-        public ASTNode getLeft() {
-            return left;
-        }
-
-        public ASTNode getRight() {
-            return right;
+        @Override
+        public <T> T accept(ASTNodeVisitor<T> visitor) {
+            return visitor.visitIdentifierNode(this);
         }
     }
 

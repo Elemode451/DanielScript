@@ -4,7 +4,7 @@ def generateNodeClass(node, indent="    "):
     className = node["name"]
     fields = node["fields"]
 
-    classCode = f"{indent}public class {className} extends ASTNode {{\n"
+    classCode = f"{indent}public static class {className} extends ASTNode {{\n"
 
     for field in fields:
         classCode += f"{indent}    private final {field['type']} {field['name']};\n"
@@ -21,17 +21,25 @@ def generateNodeClass(node, indent="    "):
         classCode += f"{indent}        return {field['name']};\n"
         classCode += f"{indent}    }}\n"
 
+    classCode += f"\n{indent}    @Override\n{indent}    public <T> T accept(ASTNodeVisitor<T> visitor) {{\n{indent}        return visitor.visit{className}(this);\n{indent}    }}\n"
+
     classCode += f"{indent}}}\n"
     return classCode
 
 def generateNodes(nodeTypes):
-    classCode = "public abstract class ASTNode {\n\n\n"
+    classCode = "public abstract class ASTNode {\n\n    public abstract <T> T accept(ASTNodeVisitor<T> visitor);\n\n"
+
+    classCode += "    public interface ASTNodeVisitor<T> {\n"
+    for node in nodeTypes:
+        className = node["name"]
+        classCode += f"        T visit{className}({className} node);\n"
+    classCode += "    }\n\n"
 
     for node in nodeTypes:
         classCode += generateNodeClass(node, indent="    ") + "\n"
 
     classCode += "}"
-    with open(os.path.join(os.getcwd(), "./ASTNode.java"), "w") as file:
+    with open(os.path.join(os.getcwd(), "ASTNode.java"), "w") as file:
         file.write(classCode)
 
 if __name__ == "__main__":
@@ -39,13 +47,13 @@ if __name__ == "__main__":
         {
             "name": "LiteralNode",
             "fields": [
-                {"type": "double", "name": "value"}
+                {"type": "Object", "name": "value"}
             ]
         },
         {
             "name": "BinaryNode",
             "fields": [
-                {"type": "String", "name": "operator"},
+                {"type": "Token", "name": "operator"},
                 {"type": "ASTNode", "name": "left"},
                 {"type": "ASTNode", "name": "right"}
             ]
@@ -53,7 +61,7 @@ if __name__ == "__main__":
         {
             "name": "UnaryNode",
             "fields": [
-                {"type": "String", "name": "operator"},
+                {"type": "Token", "name": "operator"},
                 {"type": "ASTNode", "name": "operand"}
             ]
         },
@@ -62,21 +70,7 @@ if __name__ == "__main__":
             "fields": [
                 {"type": "String", "name": "name"}
             ]
-        },
-        {
-            "name": "GroupingNode",
-            "fields": [
-                {"type": "ASTNode", "name": "expression"}
-            ]
-        },
-        {
-            "name": "EqualityNode",
-            "fields": [
-                {"type": "ASTNode", "name": "left"},
-                {"type": "ASTNode", "name": "right"}
-            ]
         }
     ]
-
 
     generateNodes(nodeTypes)

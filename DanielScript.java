@@ -1,6 +1,7 @@
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 // Class representing the overall interpreter
 public class DanielScript {
@@ -13,17 +14,28 @@ public class DanielScript {
             System.out.println("Intended use: ds [file]"); 
             System.exit(-1);
         } else {
-            readFromFile(args[0].trim());
+            List<Token> tokens = readFromFile(args[0].trim());
+            parseTokens(tokens);
         }
 
         System.out.println("Successfully executed DanielScript program " + args[0]);
         System.exit(0);
     }
+
+    private static void parseTokens(List<Token> tokens) {
+        try {
+            Parser parser = new Parser(tokens);
+            PrettyPrinter p = new PrettyPrinter();
+            System.out.println(p.print(parser.parse()));
+        } catch(Exception e) {
+            e.printStackTrace();
+            System.exit(-1);
+        }
+    }
     
     // Reads the tokens from a file. fileName must be non-null.
-    private static void readFromFile(String fileName) {
+    private static List<Token> readFromFile(String fileName) {
         String currentDirectory = System.getProperty("user.dir") + "\\" + fileName;
-        System.out.println(currentDirectory);
         try {
             byte[] source = Files.readAllBytes(Paths.get(currentDirectory));
             // UTF-8
@@ -44,14 +56,14 @@ public class DanielScript {
                 System.exit(-1);
             }
 
-            for(Token token : lexer.getTokens()) {
-                System.out.println(token);
-            }
+            return lexer.getTokens();
             
         } catch (Exception e) {
             e.printStackTrace(); 
             System.exit(-1);
         }
+
+        return null;
     }
 
     // A class representing an error in the interpretation.

@@ -1,15 +1,1 @@
-x = 4.123
-y = 5
-
-
-if (x == y) then y = x else x = y
-x = x * y + (3x / 3^7)
-x_underscore_y = 5
-_test = 5
-
-returner = 5
-print x  
-
-z = --5 - 6
-5--6
-5-3
+4 / 3 * -1 ^333/4

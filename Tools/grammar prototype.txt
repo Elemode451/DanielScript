@@ -12,9 +12,9 @@ operator       → "==" | "+"  | "-"  | "*" | "/" | "^" ;
 
 --------------------------
 expression      → equality ;
-equality        → arithmetic ( "==" arithmetic )? ;
+equality        → arithmetic ( "==" arithmetic )* ;
 arithmetic      → term ( ( "+" | "-" ) term )* ;
 term            → factor ( ( "*" | "/" ) factor )* ;
-factor          → unary ( "^" unary )* ;
+factor          → unary ( "^" factor )* ;
 unary           → ( "-" ) unary | primary ;
 primary         → NUMBER | "(" expression ")" ;
