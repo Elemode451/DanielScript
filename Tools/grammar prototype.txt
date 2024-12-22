@@ -1,0 +1,27 @@
+expression     → literal
+               | unary
+               | binary
+               | grouping ;
+
+literal        → NUMBER;
+grouping       → "(" expression ")" ;
+unary          → ( "-" ) expression ;
+binary         → expression operator expression ;
+operator       → "==" | "+"  | "-"  | "*" | "/" | "^" ;
+
+
+--------------------------
+
+expression     → equality ;
+equality       → arithmetic ( "==" arithmetic )? ;
+
+arithmetic     → literal
+               | unary
+               | binary
+               | grouping ;
+
+literal        → NUMBER ;
+grouping       → "(" arithmetic ")" ;
+unary          → ( "-" ) arithmetic ;
+binary         → arithmetic operator arithmetic ;
+operator       → "+" | "-" | "*" | "/" | "^" ;
