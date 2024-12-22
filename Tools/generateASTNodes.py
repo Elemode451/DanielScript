@@ -31,7 +31,7 @@ def generateNodes(nodeTypes):
         classCode += generateNodeClass(node, indent="    ") + "\n"
 
     classCode += "}"
-    with open(os.path.join(os.getcwd(), "ASTNode.java"), "w") as file:
+    with open(os.path.join(os.getcwd(), "./ASTNode.java"), "w") as file:
         file.write(classCode)
 
 if __name__ == "__main__":
@@ -62,7 +62,21 @@ if __name__ == "__main__":
             "fields": [
                 {"type": "String", "name": "name"}
             ]
+        },
+        {
+            "name": "GroupingNode",
+            "fields": [
+                {"type": "ASTNode", "name": "expression"}
+            ]
+        },
+        {
+            "name": "EqualityNode",
+            "fields": [
+                {"type": "ASTNode", "name": "left"},
+                {"type": "ASTNode", "name": "right"}
+            ]
         }
     ]
+
 
     generateNodes(nodeTypes)

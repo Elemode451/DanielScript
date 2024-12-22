@@ -11,17 +11,10 @@ operator       → "==" | "+"  | "-"  | "*" | "/" | "^" ;
 
 
 --------------------------
-
-expression     → equality ;
-equality       → arithmetic ( "==" arithmetic )? ;
-
-arithmetic     → literal
-               | unary
-               | binary
-               | grouping ;
-
-literal        → NUMBER ;
-grouping       → "(" arithmetic ")" ;
-unary          → ( "-" ) arithmetic ;
-binary         → arithmetic operator arithmetic ;
-operator       → "+" | "-" | "*" | "/" | "^" ;
+expression      → equality ;
+equality        → arithmetic ( "==" arithmetic )? ;
+arithmetic      → term ( ( "+" | "-" ) term )* ;
+term            → factor ( ( "*" | "/" ) factor )* ;
+factor          → unary ( "^" unary )* ;
+unary           → ( "-" ) unary | primary ;
+primary         → NUMBER | "(" expression ")" ;
