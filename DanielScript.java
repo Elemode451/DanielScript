@@ -1,11 +1,12 @@
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 // Class representing the overall interpreter
 public class DanielScript {
-    
+    private static List<Error> errors = new ArrayList<>();
     // Behavior: Handles actual interpretation of a DanielScript program
     // Exceptions: None (all are caught)  -- Caught ones are FileNotFound exception
     public static void main(String[] args){ 
@@ -38,38 +39,28 @@ public class DanielScript {
     // Reads the tokens from a file. fileName must be non-null.
     private static List<Token> readFromFile(String fileName) {
         String currentDirectory = System.getProperty("user.dir") + "\\" + fileName;
+        String code = null;
         try {
             byte[] source = Files.readAllBytes(Paths.get(currentDirectory));
             // UTF-8
-            String code = new String(source, Charset.defaultCharset());
-            if(code.isBlank() || code.isEmpty()) {
-                System.out.println("No code to process!");
-                System.exit(-1);
-            }
-                
-            // Read in the file
-            Lexer lexer = new Lexer(code);
-            if(lexer.hadError()) {
-                lexer.getErrors().stream().forEach(
-                    (s) -> {
-                        System.out.println(" >>> " + s);
-                    }
-                );
-                System.exit(-1);
-            }
-
-            return lexer.getTokens();
-            
+            code = new String(source, Charset.defaultCharset());
         } catch (Exception e) {
             e.printStackTrace(); 
             System.exit(-1);
         }
 
-        return null;
+        if(code == null || code.isBlank() || code.isEmpty()) {
+            System.out.println("No code to process!");
+            System.exit(-1);
+        }
+            
+        // Read in the file
+        Lexer lexer = new Lexer(code);
+        return lexer.getTokens();
     }
 
     // A class representing an error in the interpretation.
-    public static class Error {
+    private static class Error {
         public int line;
         public String information;
 
@@ -86,6 +77,10 @@ public class DanielScript {
             string.append(line);
             return string.toString();
         }   
+    }
+
+    public static void error(int line, String information) {
+        errors.add(new Error(line, information));
     }
 
 

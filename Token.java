@@ -3,7 +3,6 @@ import java.util.function.Function;
 public class Token {
     public final TokenType TYPE;
     public final Object VALUE;
-    public final Object LITERAL;
     public final int LINE;
 
     public static enum TokenType {
@@ -65,7 +64,6 @@ public class Token {
         // will take in a value, figure out what type it is, and store accordingly once created
         this.TYPE = type;
         this.VALUE = type.applyCast(value);
-        this.LITERAL = literal;
         this.LINE = line;
     }
 
@@ -73,8 +71,7 @@ public class Token {
         StringBuilder string = new StringBuilder();
         string.append("Type: ");
         string.append(this.TYPE);
-        string.append(" Literal: ");
-        string.append(this.LITERAL);
+
         string.append(" Value: ");
         string.append(this.VALUE);
         string.append(" Line number: ");

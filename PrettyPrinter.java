@@ -16,7 +16,7 @@ public class PrettyPrinter implements ASTNode.ASTNodeVisitor<String>{
 
     @Override
     public String visitUnaryNode(ASTNode.UnaryNode node) {
-        return parenthesize(node.getOperator().LITERAL.toString(), node.getOperand());
+        return parenthesize(node.getOperator().VALUE.toString(), node.getOperand());
     }
 
     @Override

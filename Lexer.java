@@ -4,7 +4,6 @@ public class Lexer {
     private final String source;
     private final List<Token> tokens;
     private final Map<String, Token.TokenType> reserved;
-    private final List<DanielScript.Error> errors;
     private int line;
     private int start = 0;
     private int offset = 0;
@@ -12,7 +11,6 @@ public class Lexer {
     public Lexer(String source) {
         this.source = source;
         this.tokens = new ArrayList<>();
-        this.errors = new ArrayList<>();
 
         this.reserved = Map.of(
             "if", Token.TokenType.IF,
@@ -66,7 +64,7 @@ public class Lexer {
                             addToken(Token.TokenType.VARIABLE, endName);
                         }
                     }  else {
-                        errors.add(new DanielScript.Error(line, "Unexpected character " + curr));
+                        DanielScript.error(line, "Unexpected character " + curr);
                     }
                         
             }
@@ -109,15 +107,6 @@ public class Lexer {
 
         return isNextExpected;
     }
-
-    public boolean hadError() {
-        return errors.size() != 0;
-    }
-    
-    public List<DanielScript.Error> getErrors() {
-        return this.errors;
-    }
-    
     private char nextChar() {
         if(offset < source.length()) {
             return source.charAt(offset);

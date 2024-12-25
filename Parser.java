@@ -1,16 +1,15 @@
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
     private final List<Token> TOKENS;
     private int current;
-    private final List<DanielScript.Error> ERRORS;
 
     // Tokens must be non-null
     public Parser(List<Token> tokens) {
         this.TOKENS = tokens;
         this.current = 0;
-        this.ERRORS = new ArrayList<>();
     }
 
     public ASTNode parse() {
@@ -138,16 +137,34 @@ public class Parser {
         if (match(Token.TokenType.LPAREN)) {
             ASTNode curr = expression();
             if(!match(Token.TokenType.RPAREN)) {
-                throw new IllegalArgumentException("Missing r-parenthesis");
+                DanielScript.error(peek().LINE, "Missing r-parenthesis");
+                synchronize();
             }
             return new ASTNode.GroupingNode(curr);
         }
 
-        ERRORS.add(new DanielScript.Error(current, "Expected information"));
-        throw new RuntimeException("Expected information");
+        DanielScript.error(current, "Expected information");
+        return null;
     }
 
     public boolean isMissing(Token.TokenType type) {
         return !check(type);
     }
+
+    private void synchronize() {
+        currToken();
+    
+        while (!isAtEnd()) {    
+          switch (peek().TYPE) {
+            case IF:
+            case PRINT:
+            case RETURN:
+              return;
+            default:
+                break;
+          }
+    
+          currToken();
+        }
+      }
 }
