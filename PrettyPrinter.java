@@ -22,7 +22,11 @@ public class PrettyPrinter implements ASTNode.ASTNodeVisitor<String>{
     @Override
     public String visitIdentifierNode(ASTNode.IdentifierNode node) {
         return node.getName();
+    }
 
+    @Override
+    public String visitGroupingNode(ASTNode.GroupingNode node) {
+        return node.getExpression().accept(this);
     }
 
     // THANK YOU CRAFTINGINTERPRETERS!

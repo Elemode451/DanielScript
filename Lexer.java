@@ -71,6 +71,8 @@ public class Lexer {
                         
             }
         }
+
+        addToken(Token.TokenType.EOF);
     }
 
     private boolean notAtEnd() {

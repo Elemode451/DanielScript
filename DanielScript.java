@@ -15,6 +15,7 @@ public class DanielScript {
             System.exit(-1);
         } else {
             List<Token> tokens = readFromFile(args[0].trim());
+            // tokens.forEach(System.out::println);
             parseTokens(tokens);
         }
 

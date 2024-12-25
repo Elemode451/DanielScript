@@ -47,7 +47,7 @@ if __name__ == "__main__":
         {
             "name": "LiteralNode",
             "fields": [
-                {"type": "Object", "name": "value"}
+                {"type": "Object", "name": "literal"}
             ]
         },
         {
@@ -70,7 +70,14 @@ if __name__ == "__main__":
             "fields": [
                 {"type": "String", "name": "name"}
             ]
-        }
+        },
+        {
+            "name": "GroupingNode",
+            "fields": [
+                {"type": "ASTNode", "name": "expression"}
+            ]
+        },
+
     ]
 
     generateNodes(nodeTypes)

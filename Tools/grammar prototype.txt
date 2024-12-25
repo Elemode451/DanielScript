@@ -17,4 +17,5 @@ arithmetic      → term ( ( "+" | "-" ) term )* ;
 term            → factor ( ( "*" | "/" ) factor )* ;
 factor          → unary ( "^" factor )* ;
 unary           → ( "-" ) unary | primary ;
-primary         → NUMBER | "(" expression ")" ;
+primary         → NUMBER | GROUPING;
+grouping        → "(" expression ")" ;

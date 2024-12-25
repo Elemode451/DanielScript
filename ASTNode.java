@@ -7,6 +7,7 @@ public abstract class ASTNode {
         T visitBinaryNode(BinaryNode node);
         T visitUnaryNode(UnaryNode node);
         T visitIdentifierNode(IdentifierNode node);
+        T visitGroupingNode(GroupingNode node);
     }
 
     public static class LiteralNode extends ASTNode {
@@ -92,6 +93,23 @@ public abstract class ASTNode {
         @Override
         public <T> T accept(ASTNodeVisitor<T> visitor) {
             return visitor.visitIdentifierNode(this);
+        }
+    }
+
+    public static class GroupingNode extends ASTNode {
+        private final ASTNode expression;
+
+        public GroupingNode(ASTNode expression) {
+            this.expression = expression;
+        }
+
+        public ASTNode getExpression() {
+            return expression;
+        }
+
+        @Override
+        public <T> T accept(ASTNodeVisitor<T> visitor) {
+            return visitor.visitGroupingNode(this);
         }
     }
 
