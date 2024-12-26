@@ -3,37 +3,50 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 // Class representing the overall interpreter
 public class DanielScript {
-    private static List<Error> errors = new ArrayList<>();
+    private static final List<Error> ERRORS = new ArrayList<>();
+    private static final Evaluator INTERP = new Evaluator();
+
     // Behavior: Handles actual interpretation of a DanielScript program
     // Exceptions: None (all are caught)  -- Caught ones are FileNotFound exception
     public static void main(String[] args){ 
         args = new String[]{"test.ds"};
-        if(args == null || args.length > 1 || args.length < 1) {
+        if(args == null || args.length > 1) {
             System.out.println("Intended use: ds [file]"); 
             System.exit(-1);
+        } else if(args.length == 0) {
+            // will add REPL later
         } else {
             List<Token> tokens = readFromFile(args[0].trim());
-            // tokens.forEach(System.out::println);
-            parseTokens(tokens);
+            ExprNode parse = parseTokens(tokens);
+            INTERP.run(parse);
         }
 
         System.out.println("Successfully executed DanielScript program " + args[0]);
         System.exit(0);
     }
 
-    private static void parseTokens(List<Token> tokens) {
+    private static ExprNode parseTokens(List<Token> tokens) {
         try {
             Parser parser = new Parser(tokens);
-            PrettyPrinter p = new PrettyPrinter();
             var parse = parser.parse();
-            System.out.println(p.print(parse));
+            if(hadError()) {
+                System.out.println("ERRORS");
+                ERRORS.forEach(System.out::println);
+                System.exit(-1);
+            }
+
+            return parse;
+    
         } catch(Exception e) {
             e.printStackTrace();
             System.exit(-1);
         }
+
+        return null;
     }
     
     // Reads the tokens from a file. fileName must be non-null.
@@ -80,7 +93,11 @@ public class DanielScript {
     }
 
     public static void error(int line, String information) {
-        errors.add(new Error(line, information));
+        ERRORS.add(new Error(line, information));
+    }
+
+    private static boolean hadError() {
+        return ERRORS.size() != 0;
     }
 
 

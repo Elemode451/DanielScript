@@ -1,10 +1,10 @@
 import os
 
-def generateNodeClass(node, indent="    "):
+def generateNodeClass(node, name, indent="    "):
     className = node["name"]
     fields = node["fields"]
 
-    classCode = f"{indent}public static class {className} extends ASTNode {{\n"
+    classCode = f"{indent}public static class {className} extends " + name + "{\n"
 
     for field in fields:
         classCode += f"{indent}    private final {field['type']} {field['name']};\n"
@@ -21,29 +21,29 @@ def generateNodeClass(node, indent="    "):
         classCode += f"{indent}        return {field['name']};\n"
         classCode += f"{indent}    }}\n"
 
-    classCode += f"\n{indent}    @Override\n{indent}    public <T> T accept(ASTNodeVisitor<T> visitor) {{\n{indent}        return visitor.visit{className}(this);\n{indent}    }}\n"
+    classCode += f"\n{indent}    @Override\n{indent}    public <T> T accept(" + name + f"Visitor<T> visitor) {{\n{indent}        return visitor.visit{className}(this);\n{indent}    }}\n"
 
     classCode += f"{indent}}}\n"
     return classCode
 
-def generateNodes(nodeTypes):
-    classCode = "public abstract class ASTNode {\n\n    public abstract <T> T accept(ASTNodeVisitor<T> visitor);\n\n"
+def generateNodes(nodeTypes, name):
+    classCode = "public abstract class " + name + "{\n\n    public abstract <T> T accept(" + name + "Visitor<T> visitor);\n\n"
 
-    classCode += "    public interface ASTNodeVisitor<T> {\n"
+    classCode += "    public interface " + name + "Visitor<T> {\n"
     for node in nodeTypes:
         className = node["name"]
         classCode += f"        T visit{className}({className} node);\n"
     classCode += "    }\n\n"
 
     for node in nodeTypes:
-        classCode += generateNodeClass(node, indent="    ") + "\n"
+        classCode += generateNodeClass(node, name, indent="    ") + "\n"
 
     classCode += "}"
-    with open(os.path.join(os.getcwd(), "ASTNode.java"), "w") as file:
+    with open(os.path.join(os.getcwd(), name + ".java"), "w") as file:
         file.write(classCode)
 
 if __name__ == "__main__":
-    nodeTypes = [
+    exprNodeTypes = [
         {
             "name": "LiteralNode",
             "fields": [
@@ -54,30 +54,40 @@ if __name__ == "__main__":
             "name": "BinaryNode",
             "fields": [
                 {"type": "Token", "name": "operator"},
-                {"type": "ASTNode", "name": "left"},
-                {"type": "ASTNode", "name": "right"}
+                {"type": "ExprNode", "name": "left"},
+                {"type": "ExprNode", "name": "right"}
             ]
         },
         {
             "name": "UnaryNode",
             "fields": [
                 {"type": "Token", "name": "operator"},
-                {"type": "ASTNode", "name": "operand"}
-            ]
-        },
-        {
-            "name": "IdentifierNode",
-            "fields": [
-                {"type": "String", "name": "name"}
+                {"type": "ExprNode", "name": "operand"}
             ]
         },
         {
             "name": "GroupingNode",
             "fields": [
-                {"type": "ASTNode", "name": "expression"}
+                {"type": "ExprNode", "name": "expression"}
             ]
         },
 
     ]
-
-    generateNodes(nodeTypes)
+    
+    stmtNodeTypes = [
+        {
+            "name": "PrintNode",
+            "fields": [
+                {"type": "ExprNode", "name": "expression"}
+            ]
+        },
+        {
+            "name": "AssignmentNode",
+            "fields": [
+                {"type": "String", "name": "variableName"},
+                {"type": "ExprNode", "name": "expression"}
+            ]
+        },
+    ]
+    generateNodes(exprNodeTypes, "ExprNode")
+    generateNodes(stmtNodeTypes, "StatementNode")

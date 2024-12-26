@@ -11,6 +11,10 @@ operator       → "==" | "+"  | "-"  | "*" | "/" | "^" ;
 
 
 --------------------------
+program      → statement* EOF ;
+statement    → expression | identifier "=" expression ";" | "print" expression ";" ;
+identifier   → STRING ;
+
 expression      → equality ;
 equality        → arithmetic ( "==" arithmetic )* ;
 arithmetic      → term ( ( "+" | "-" ) term )* ;

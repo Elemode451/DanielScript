@@ -21,6 +21,11 @@ public class Lexer {
         );
 
         
+        processTokens(source);
+        addToken(Token.TokenType.EOF);
+    }
+
+    private void processTokens(String source) {
         char curr;
         while(notAtEnd()) {
             start = offset;
@@ -33,6 +38,7 @@ public class Lexer {
                 case '*': addToken(Token.TokenType.MULTIPLY); break;
                 case '^': addToken(Token.TokenType.EXPONENT); break; 
                 case '-': addToken(Token.TokenType.MINUS); break;
+                case ';': addToken(Token.TokenType.SEMICOLON); break;
                 case '=':
                     addToken(checkAhead('=') ? Token.TokenType.EQUIVALENCE : Token.TokenType.ASSIGNMENT);
                     break;
@@ -69,8 +75,6 @@ public class Lexer {
                         
             }
         }
-
-        addToken(Token.TokenType.EOF);
     }
 
     private boolean notAtEnd() {

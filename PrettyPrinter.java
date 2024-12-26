@@ -1,40 +1,35 @@
-public class PrettyPrinter implements ASTNode.ASTNodeVisitor<String>{
+public class PrettyPrinter implements ExprNode.ExprNodeVisitor<String>{
 
-    String print(ASTNode root) {
+    String print(ExprNode root) {
         return root.accept(this);
     }
 
     @Override
-    public String visitLiteralNode(ASTNode.LiteralNode node) {
+    public String visitLiteralNode(ExprNode.LiteralNode node) {
         return node.getLiteral().toString();
     }
 
     @Override
-    public String visitBinaryNode(ASTNode.BinaryNode node) {
+    public String visitBinaryNode(ExprNode.BinaryNode node) {
         return parenthesize(node.getOperator().VALUE.toString(), node.getLeft(), node.getRight());
     }
 
     @Override
-    public String visitUnaryNode(ASTNode.UnaryNode node) {
+    public String visitUnaryNode(ExprNode.UnaryNode node) {
         return parenthesize(node.getOperator().VALUE.toString(), node.getOperand());
     }
 
     @Override
-    public String visitIdentifierNode(ASTNode.IdentifierNode node) {
-        return node.getName();
-    }
-
-    @Override
-    public String visitGroupingNode(ASTNode.GroupingNode node) {
+    public String visitGroupingNode(ExprNode.GroupingNode node) {
         return node.getExpression().accept(this);
     }
 
     // THANK YOU CRAFTINGINTERPRETERS!
-    private String parenthesize(String name, ASTNode... exprs) {
+    private String parenthesize(String name, ExprNode... exprs) {
         StringBuilder builder = new StringBuilder();
     
         builder.append("(").append(name);
-        for (ASTNode expr : exprs) {
+        for (ExprNode expr : exprs) {
           builder.append(" ");
           builder.append(expr.accept(this));
         }

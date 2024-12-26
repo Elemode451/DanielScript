@@ -10,7 +10,7 @@ public class Parser {
         this.current = 0;
     }
 
-    public ASTNode parse() {
+    public ExprNode parse() {
         try {
             return expression();
         } catch (Exception e) {
@@ -61,84 +61,84 @@ public class Parser {
         return peek().TYPE.equals(type);
     }
 
-    public ASTNode expression() {
+    public ExprNode expression() {
         return equality();
     }
 
-    public ASTNode equality() {
-        ASTNode root = arithmetic();
-        ASTNode curr;
+    public ExprNode equality() {
+        ExprNode root = arithmetic();
+        ExprNode curr;
         Token operator;
         while (match(Token.TokenType.EQUIVALENCE)) {
             operator = prevToken();
             curr = arithmetic();
-            root = new ASTNode.BinaryNode(operator, root, curr);
+            root = new ExprNode.BinaryNode(operator, root, curr);
         }
 
         return root;
     }
 
-    public ASTNode arithmetic() {
-        ASTNode root = term();
-        ASTNode curr;
+    public ExprNode arithmetic() {
+        ExprNode root = term();
+        ExprNode curr;
         Token operator;
         while (match(List.of(Token.TokenType.PLUS, Token.TokenType.MINUS))) {
             operator = prevToken();
             curr = term();
-            root = new ASTNode.BinaryNode(operator, root, curr);
+            root = new ExprNode.BinaryNode(operator, root, curr);
         }
 
         return root;
     }
 
-    public ASTNode term() {
-        ASTNode root = factor();
-        ASTNode curr;
+    public ExprNode term() {
+        ExprNode root = factor();
+        ExprNode curr;
         Token operator;
         while (match(List.of(Token.TokenType.MULTIPLY, Token.TokenType.DIVIDE))) {
             operator = prevToken();
             curr = factor();
-            root = new ASTNode.BinaryNode(operator, root, curr);
+            root = new ExprNode.BinaryNode(operator, root, curr);
         }
 
         return root;
     }
 
-    public ASTNode factor() {
-        ASTNode root = unary();
-        ASTNode curr;
+    public ExprNode factor() {
+        ExprNode root = unary();
+        ExprNode curr;
         Token operator;
         while (match(Token.TokenType.EXPONENT)) {
             operator = prevToken();
             curr = factor();
-            root = new ASTNode.BinaryNode(operator, root, curr);
+            root = new ExprNode.BinaryNode(operator, root, curr);
         }
         return root;
     }
 
-    public ASTNode unary() {
+    public ExprNode unary() {
         if (match(Token.TokenType.MINUS)) {
-            ASTNode curr = unary();
+            ExprNode curr = unary();
             Token operator = prevToken();
-            return new ASTNode.UnaryNode(operator, curr);
+            return new ExprNode.UnaryNode(operator, curr);
         }
 
         return primary();
     }
 
-    public ASTNode primary() {
+    public ExprNode primary() {
         if (match(Token.TokenType.NUMBER)) {
             Token curr = prevToken();
-            return new ASTNode.LiteralNode(curr.VALUE);
+            return new ExprNode.LiteralNode(curr.VALUE);
         }
 
         if (match(Token.TokenType.LPAREN)) {
-            ASTNode curr = expression();
+            ExprNode curr = expression();
             if(!match(Token.TokenType.RPAREN)) {
                 DanielScript.error(peek().LINE, "Missing r-parenthesis");
                 synchronize();
             }
-            return new ASTNode.GroupingNode(curr);
+            return new ExprNode.GroupingNode(curr);
         }
 
         DanielScript.error(current, "Expected information");

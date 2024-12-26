@@ -27,6 +27,7 @@ public class Token {
         RPAREN, 
 
         // EOF
+        SEMICOLON,
         EOF;
         
         //For datatypes with custom logic, will want to cast them when creating token
